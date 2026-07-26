@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'node:path';
 import { app } from 'electron';
 
-export type ScanStatus = 'READ' | 'OCR_ERROR' | 'BLOCKED' | 'AUTHORIZED';
+export type ScanStatus = 'READ' | 'OCR_ERROR' | 'BLOCKED' | 'AUTHORIZED' | 'REVIEW_REQUIRED';
 
 export interface ScanRecordInput {
   prestationNumber: string | null;
