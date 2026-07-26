@@ -47,6 +47,8 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Construire l’application
+        run: npm run build
       - name: Générer l’installateur
         run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }}
         env:
