@@ -1,6 +1,6 @@
 {
   "name": "nassist-manager-pro",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Assistant métier N'Assist pour ServiceBag et les opérations en gare.",
   "author": "Sofiane Hamoum",
@@ -14,12 +14,14 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "better-sqlite3": "latest",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "tesseract.js": "^6.0.1"
+    "tesseract.js": "latest"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
