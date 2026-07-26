@@ -7,7 +7,7 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && tsc -p electron/tsconfig.json && electron .\"",
-    "build": "tsc -b && vite build && tsc -p electron/tsconfig.json",
+    "build": "npm run typecheck && vite build && tsc -p electron/tsconfig.json",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
