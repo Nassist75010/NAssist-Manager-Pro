@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import path from 'node:path';
 import { listScans, saveScan, type ScanRecordInput } from './database';
 import { validateServiceBagUrl } from './security/urlPolicy';
@@ -71,6 +71,7 @@ function createWindow() {
     minHeight: 720,
     title: "N'Assist Manager Pro",
     backgroundColor: '#08101d',
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -80,8 +81,28 @@ function createWindow() {
   });
 
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
-  if (isDev) void window.loadURL('http://localhost:5173');
-  else void window.loadFile(path.join(__dirname, '../dist/index.html'));
+  window.once('ready-to-show', () => window.show());
+
+  window.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL) => {
+    console.error('Échec du chargement de l’interface', { errorCode, errorDescription, validatedURL });
+    void dialog.showErrorBox(
+      "N'Assist Manager Pro",
+      `L’interface n’a pas pu être chargée.\n\n${errorDescription} (${errorCode})`
+    );
+  });
+
+  if (isDev) {
+    void window.loadURL('http://localhost:5173');
+  } else {
+    const indexPath = path.join(app.getAppPath(), 'dist', 'index.html');
+    void window.loadFile(indexPath).catch((error: unknown) => {
+      console.error('Impossible de charger index.html', error);
+      dialog.showErrorBox(
+        "N'Assist Manager Pro",
+        `Impossible de charger l’interface depuis :\n${indexPath}`
+      );
+    });
+  }
 }
 
 app.whenReady().then(() => {
