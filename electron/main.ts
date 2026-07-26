@@ -1,18 +1,13 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'node:path';
 import { listScans, saveScan, type ScanRecordInput } from './database';
+import { validateServiceBagUrl } from './security/urlPolicy';
 
 const isDev = !app.isPackaged;
 let serviceBagWindow: BrowserWindow | null = null;
 
-function validateHttpUrl(value: string) {
-  const url = new URL(value);
-  if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Seules les adresses HTTP ou HTTPS sont autorisées.');
-  return url.toString();
-}
-
 function openReadOnlyBrowser(rawUrl: string) {
-  const targetUrl = validateHttpUrl(rawUrl);
+  const targetUrl = validateServiceBagUrl(rawUrl);
   if (serviceBagWindow && !serviceBagWindow.isDestroyed()) {
     serviceBagWindow.focus();
     void serviceBagWindow.loadURL(targetUrl);
@@ -29,7 +24,15 @@ function openReadOnlyBrowser(rawUrl: string) {
       sandbox: true
     }
   });
+
   serviceBagWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  serviceBagWindow.webContents.on('will-navigate', (event, navigationUrl) => {
+    try {
+      validateServiceBagUrl(navigationUrl);
+    } catch {
+      event.preventDefault();
+    }
+  });
   serviceBagWindow.on('closed', () => { serviceBagWindow = null; });
   void serviceBagWindow.loadURL(targetUrl);
   return true;
@@ -37,6 +40,7 @@ function openReadOnlyBrowser(rawUrl: string) {
 
 async function extractVisibleText() {
   if (!serviceBagWindow || serviceBagWindow.isDestroyed()) throw new Error('La fenêtre ServiceBag n’est pas ouverte.');
+  validateServiceBagUrl(serviceBagWindow.webContents.getURL());
   const text = await serviceBagWindow.webContents.executeJavaScript(`document.body?.innerText || ''`, true);
   return {
     text: String(text).slice(0, 100000),
@@ -70,10 +74,12 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      sandbox: true
     }
   });
 
+  window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   if (isDev) void window.loadURL('http://localhost:5173');
   else void window.loadFile(path.join(__dirname, '../dist/index.html'));
 }
