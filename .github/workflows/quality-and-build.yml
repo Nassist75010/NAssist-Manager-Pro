@@ -27,7 +27,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
+        include:
+          - os: windows-latest
+            platform: win
+            arch: x64
+            artifact: Windows-x64
+          - os: macos-13
+            platform: mac
+            arch: x64
+            artifact: macOS-Intel-x64
+          - os: macos-latest
+            platform: mac
+            arch: arm64
+            artifact: macOS-Apple-Silicon-arm64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -35,11 +47,12 @@ jobs:
         with:
           node-version: 22
       - run: npm install
-      - run: npm run dist
+      - name: Générer l’installateur
+        run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - uses: actions/upload-artifact@v4
         with:
-          name: nassist-manager-pro-${{ runner.os }}
+          name: nassist-manager-pro-${{ matrix.artifact }}
           path: release/**
           if-no-files-found: error
