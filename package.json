@@ -1,0 +1,38 @@
+{
+  "name": "nassist-manager-pro",
+  "version": "0.7.0",
+  "private": true,
+  "description": "Assistant métier N'Assist pour ServiceBag et les opérations en gare.",
+  "author": "Sofiane Hamoum",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && tsc -p electron/tsconfig.json && electron .\"",
+    "build": "npm run typecheck && vite build && tsc -p electron/tsconfig.json",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "better-sqlite3": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tesseract.js": "latest"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "concurrently": "latest",
+    "electron": "latest",
+    "electron-builder": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest",
+    "wait-on": "latest"
+  }
+}

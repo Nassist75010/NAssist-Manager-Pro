@@ -1,0 +1,60 @@
+name: Qualité et installateurs
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run typecheck
+      - run: npm test
+      - name: Construire l’interface Vite
+        run: npx vite build
+      - name: Compiler Electron
+        run: npx tsc -p electron/tsconfig.json
+
+  package:
+    needs: quality
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            arch: x64
+            artifact: Windows-x64
+          - os: macos-26-intel
+            platform: mac
+            arch: x64
+            artifact: macOS-Intel-x64
+          - os: macos-latest
+            platform: mac
+            arch: arm64
+            artifact: macOS-Apple-Silicon-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Construire l’application
+        run: npm run build
+      - name: Générer l’installateur
+        run: npx electron-builder --${{ matrix.platform }} --${{ matrix.arch }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nassist-manager-pro-${{ matrix.artifact }}
+          path: release/**
+          if-no-files-found: error

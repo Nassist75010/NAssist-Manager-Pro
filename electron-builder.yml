@@ -1,0 +1,29 @@
+appId: fr.nassist.managerpro
+productName: NAssist Manager Pro
+copyright: Copyright © 2026 Sofiane Hamoum
+directories:
+  output: release
+files:
+  - dist/**
+  - dist-electron/**
+  - package.json
+asar: true
+asarUnpack:
+  - node_modules/better-sqlite3/**
+mac:
+  category: public.app-category.business
+  target:
+    - dmg
+    - zip
+  hardenedRuntime: true
+  gatekeeperAssess: false
+win:
+  target:
+    - nsis
+  artifactName: NAssist-Manager-Pro-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+publish: null

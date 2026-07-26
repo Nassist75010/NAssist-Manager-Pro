@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "N’Assist ServiceBag",
+  "version": "1.0.0",
+  "description": "Assistant métier compact pour ServiceBag : caméra, historique, raccourcis et alertes.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://*.lightning.force.com/*", "https://*.salesforce.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://*.lightning.force.com/*", "https://*.salesforce.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "N’Assist ServiceBag"
+  }
+}
